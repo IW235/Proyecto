@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:q_alert/color_palette.dart';
+//import 'package:q_alert/pages/login_screen.dart';
+
 
 class GradientButton extends StatelessWidget{
-  const GradientButton({super.key});
+  const GradientButton({super.key, required Null Function() onPressed});
+
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +23,8 @@ class GradientButton extends StatelessWidget{
         borderRadius: BorderRadius.circular(7),
         ),
         child: ElevatedButton(
-          onPressed: () {},
+          onPressed: () {
+          },
           style: ElevatedButton.styleFrom(  
             fixedSize: const Size(395, 55),
             backgroundColor: Colors.transparent,

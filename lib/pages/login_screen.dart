@@ -1,9 +1,52 @@
 import 'package:flutter/material.dart';
+import 'package:q_alert/pages/dashboard_screen.dart';
+//import 'pages/dashboard_screen.dart';
+
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:q_alert/services/auth_service.dart';
+
 import 'package:q_alert/widgets/gradient_button.dart';
 import 'package:q_alert/widgets/login_field.dart';
 
-class LoginScreen extends StatelessWidget {
+
+
+
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  bool _isNotValid = false;
+  late SharedPreferences preferences;
+
+  void loginUser() async {
+    if (emailController.text.isNotEmpty && passwordController.text.isNotEmpty) {
+    var token = await AuthService.loginUser(
+        emailController.text, passwordController.text);
+
+      if (token != null) {
+        print('Login successful');
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) => const DashboardScreen()));
+      } else {
+        print('Login failed');
+      }
+    } else {
+      setState(() {
+        _isNotValid = true;
+      });
+    }
+  }
+
+  /*void signUp() {
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => const SignUp()));
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -43,11 +86,15 @@ class LoginScreen extends StatelessWidget {
                         SizedBox(height: 20),
                         //Image.asset('assets/icon/iniciar-sesion.png', height: 100),
                         //SizedBox(height: 40),
-                        LoginField(hintText: 'Email'),
+                        LoginField(emailController, hintText: 'Email'),
                         SizedBox(height: 15),
-                        LoginField(hintText: 'Password', isPassword: true),
+                        LoginField(passwordController, hintText: 'Password', isPassword: true),
                         SizedBox(height: 20),
-                        GradientButton(),
+                        GradientButton(
+                          onPressed: () {
+                          loginUser();
+                          },
+                        ),
                         SizedBox(height: 20),
                         Text(
                           'Desarrollado por KaibaCorp',

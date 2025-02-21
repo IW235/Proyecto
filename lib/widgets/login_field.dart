@@ -39,7 +39,7 @@ class LoginField extends StatefulWidget {
   final String hintText;
   final bool isPassword;
 
-  const LoginField(
+  const LoginField(TextEditingController emailController, 
       {super.key, required this.hintText, this.isPassword = false});
 
   @override

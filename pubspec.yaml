@@ -35,7 +35,7 @@ dependencies:
   flutter_svg: ^2.0.17
   mongo_dart: ^0.10.4
   velocity_x: ^4.3.0
-  http: 
+  http: ^1.1.0
   shared_preferences: ^2.5.2
   jwt_decoder: ^2.0.1 
   flutter_slidable: ^4.0.0
