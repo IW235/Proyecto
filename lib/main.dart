@@ -7,6 +7,7 @@ import 'pages/login_screen.dart';
 
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences preferences = await SharedPreferences.getInstance();
   runApp(MyApp(tokens:preferences.getString('token'),));
 }
@@ -28,6 +29,8 @@ class MyApp extends StatelessWidget {
       home: (tokens != null && JwtDecoder.isExpired(tokens) == false)
       ? DashboardScreen()
       : LoginScreen(),
+
+
     );
   }
 }

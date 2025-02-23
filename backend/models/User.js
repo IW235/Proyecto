@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
+  nombre: { type: String, required: true },  // Aquí añades el campo "nombre"
   email: {
     type: String,
     required: true,
@@ -10,7 +11,8 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true
-  }
+  },
+  numEmpleado: { type: String, required: true }  // Añades "numEmpleado"
 });
 
 // Hash password before saving

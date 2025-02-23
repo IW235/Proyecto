@@ -39,6 +39,7 @@ dependencies:
   shared_preferences: ^2.5.2
   jwt_decoder: ^2.0.1 
   flutter_slidable: ^4.0.0
+  flutter_secure_storage: ^5.0.2
 
 
 dev_dependencies:
@@ -61,7 +62,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/icon/
-    - assets/svgs/
+    #- assets/svgs/
     - assets/imagen/
 
   # An image asset can refer to one or more resolution-specific "variants", see
