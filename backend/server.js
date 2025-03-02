@@ -12,26 +12,37 @@ app.use(express.json());
 
 
 // Conectar a MongoDB Atlas
-mongoose.connect('mongodb+srv://a1122150092:WHEm2kv1SPwKURh3@schoolproyect.nnkdi.mongodb.net/q_alert?retryWrites=true&w=majority&appName=SchoolProyect')
+mongoose.connect('mongodb+srv://a1122150092:WHEm2kv1SPwKURh3@schoolproyect.nnkdi.mongodb.net/QualityAlertSystem?retryWrites=true&w=majority&appName=SchoolProyect')  //q_alert
   .then(() => console.log('Conectado a MongoDB Atlas'))
   .catch(err => console.log(err));
 
 // Definir el esquema de usuario
 const userSchema = new mongoose.Schema({
-  nombre: String,
+  employeeNumber: String,
+  firstName: String,
+  lastName: String,
+  password: String,
+  role: String,
+  area: String,
+  email: String,
+  createdAt: Date,
+  updatedAt: Date
+  /*nombre: String,
   email: String,
   password: String,
-  numEmpleado: String
+  numEmpleado: String*/
 });
 
 const User = mongoose.model('User', userSchema);
 
 // Ruta para registrar un usuario
 app.post('/register', async (req, res) => {
-  const { nombre, email, password, numEmpleado } = req.body;
+  //const { nombre, email, password, numEmpleado } = req.body;
+  //employeeNumber, firstName, lastName, password, role, area, email, createdAt, updatedAt
+  const { employeeNumber, firstName, lastName, password, role, area, email, createdAt, updatedAt } = req
   console.log("Recibiendo datos del cliente:", req.body);  // Verifica que los datos lleguen correctamente
 
-  if (!nombre || !email || !password || !numEmpleado) {
+  if (!employeeNumber || !firstName || !lastName || !password || !role || !area || !email || !createdAt || !updatedAt) {   //!nombre || !email || !password || !numEmpleado
     return res.status(400).json({ error: 'Todos los campos son obligatorios' });
   }
 
@@ -42,10 +53,20 @@ app.post('/register', async (req, res) => {
 
     // Crear el nuevo usuario con la contraseña hasheada
     const newUser = new User({
-      nombre,
+      employeeNumber,
+      firstName,
+      lastName,
+      password: hashedPassword,
+      role,
+      area,
       email,
-      password: hashedPassword, // Guardar la contraseña hasheada
-      numEmpleado
+      createdAt,
+      updatedAt
+
+      /*nombre,
+      email,
+      password: hashedPassword, Guardar la contraseña hasheada
+      numEmpleado*/
     });
 
     await newUser.save();  // Guardar en la base de datos
@@ -58,11 +79,11 @@ app.post('/register', async (req, res) => {
 
 // Ruta para iniciar sesión
 app.post('/login', async (req, res) => {
-  const { email, password } = req.body;
+  const { employeeNumber, password } = req.body;  //const { email, password } = req.body;
 
   try {
-    // Buscar el usuario por su correo
-    const user = await User.findOne({ email });
+    // Buscar el usuario por su correo o numEmployee
+    const user = await User.findOne({ employeeNumber }); //email
     if (!user) {
       return res.status(400).json({ error: 'Usuario no encontrado' });
     }
@@ -75,7 +96,16 @@ app.post('/login', async (req, res) => {
 
     // Generar un token JWT
     const token = jwt.sign({ userId: user._id }, 'secretKey', { expiresIn: '1h' });
-    res.status(200).json({ token });
+    res.status(200).json({
+      token,
+      user: {
+        employeeNumber: user.employeeNumber,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+        area: user.area,
+      },
+    });
   } catch (err) {
     console.error('Error en el inicio de sesión:', err);
     res.status(500).json({ error: 'Error en el servidor' });

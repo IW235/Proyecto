@@ -4,7 +4,7 @@ import '../connections/constant.dart';
 
 class AuthService {
   // Método para iniciar sesión
-  static Future<String?> loginUser(String email, String password) async {
+  static Future<Map<String,dynamic>?> loginUser(String employeeNumber, String password) async {   ///email
     try {
       // Construir la URL completa
       final url = Uri.parse("${ApiConstants.baseUrl}${ApiConstants.loginEndpoint}");
@@ -14,7 +14,7 @@ class AuthService {
         url, // Usar la URL completa
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          'email': email,
+          'employeeNumber': employeeNumber,
           'password': password,
         }),
       );
@@ -23,9 +23,9 @@ class AuthService {
       if (response.statusCode == 200) {
         // Si la respuesta es exitosa, decodificar el JSON
         final data = jsonDecode(response.body);
-        if (data['token'] != null) {
+        if (data['token'] != null && data['user'] != null) {
           print('Login successful, token: ${data['token']}');
-          return data['token']; // Devolver el token
+          return data; // Devolver el token
         } else {
           print('Error: No token received in response');
           return null;
