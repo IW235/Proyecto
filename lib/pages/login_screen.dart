@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:q_alert/pages/inspector_home_screen.dart';
 import 'package:q_alert/pages/supervisor_home_screen.dart';
+import 'package:q_alert/services/socket_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:q_alert/services/auth_service.dart';
 import 'package:q_alert/widgets/gradient_button.dart';
+import 'package:q_alert/color_palette.dart';
 import 'package:q_alert/widgets/login_field.dart';
 import 'package:q_alert/pages/operator_home_screen.dart';
 
@@ -106,7 +108,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   firstName: firstName,
                   lastName: lastName,
                   area: area,
-                ), //const DashboardScreen()
+                  socketService: SocketService(),
+                ),
+                //const DashboardScreen()
               ),
             );
             break;
@@ -120,6 +124,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   firstName: firstName,
                   lastName: lastName,
                   area: area,
+                  socketService: SocketService(),
                 ),
               ),
             );
@@ -148,7 +153,8 @@ class _LoginScreenState extends State<LoginScreen> {
         // Mostrar mensaje de error si el inicio de sesión falla
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Incorrect employee number or password please try again or call the IT department.'),
+            content:
+                Text('Usuario o contraseña incorrectos. Intente nuevamente.'),
             backgroundColor: Colors.red,
           ),
         );
@@ -171,72 +177,145 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600; // Umbral para diseño móvil
     return Scaffold(
-      body: Stack(
-        children: [
-          Column(
-            children: [
-              Container(
-                height: MediaQuery.of(context).size.height * 0.4,
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage('assets/imagen/avionPaginaInicio.jpg'),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.6,
-                child: SingleChildScrollView(
-                  child: Center(
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 60),
-                        const Text(
-                          'Log in',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 50,
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        LoginField(
-                          controller:
-                              employeeNumController, // Pasar el controlador
-                          hintText:
-                              'Employee Number', // Pasar el texto de sugerencia
-                        ),
-                        const SizedBox(height: 15),
-                        LoginField(
-                          controller:
-                              passwordController, // Pasar el controlador
-                          hintText: 'Password', // Pasar el texto de sugerencia
-                          isPassword:
-                              true, // Indicar que es un campo de contraseña
-                        ),
-                        const SizedBox(height: 20),
-                        if (_isLoading)
-                          const CircularProgressIndicator() // Indicador de carga
-                        else
-                          GradientButton(
-                            onPressed: loginUser, // Pasar la función de login
-                          ),
-                        const SizedBox(height: 20),
-                        const Text(
-                          'Developed by KaibaCorp',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colorpalette.gradient1,
+              Colorpalette.gradient2,
             ],
           ),
-          Positioned(
+        ),
+        child: Center(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Container(
+                constraints: BoxConstraints(
+                  maxWidth: isMobile ? double.infinity : 500,
+                ),
+                decoration: BoxDecoration(
+                  color: Colorpalette.whiteColor,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 20,
+                      spreadRadius: 5,
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(30.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Logo y título
+                      Column(
+                        children: [
+                          Container(
+                            width: 100,
+                            height: 100,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colorpalette.whiteColor,
+                              border: Border.all(
+                                color: Colorpalette.gradient5,
+                                width: 3,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 10,
+                                  spreadRadius: 2,
+                                ),
+                              ],
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(15.0),
+                              child: Image.asset(
+                                'assets/icon/iniciar-sesion.png',
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          Text(
+                            'QAlert',
+                            style: TextStyle(
+                              fontSize: isMobile ? 28 : 32,
+                              fontWeight: FontWeight.bold,
+                              color: Colorpalette.borderColor,
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            'Inicio de sesión',
+                            style: TextStyle(
+                              fontSize: isMobile ? 18 : 20,
+                              color: Colorpalette.borderColor.withOpacity(0.7),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 30),
+                      // Campos de formulario
+                      LoginField(
+                        controller: employeeNumController,
+                        hintText: 'Número de empleado',
+                        icon: Icons.person_outline,
+                      ),
+                      const SizedBox(height: 15),
+                      LoginField(
+                        controller: passwordController,
+                        hintText: 'Contraseña',
+                        isPassword: true,
+                        icon: Icons.lock_outline,
+                      ),
+
+                      const SizedBox(height: 25),
+
+                      // Botón de login
+                      if (_isLoading)
+                        const CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Colorpalette.gradient3,
+                          ),
+                        )
+                      else
+                        GradientButton(
+                          onPressed: loginUser,
+                          text: 'Iniciar sesión',
+                          gradientColors: [
+                            Colorpalette.gradient3,
+                            Colorpalette.gradient4,
+                          ],
+                        ),
+
+                      const SizedBox(height: 20),
+                      // Footer
+
+                      Text(
+                        'Desarrollado por KaibaCorp',
+                        style: TextStyle(
+                          fontSize: isMobile ? 12 : 14,
+                          color: Colorpalette.borderColor.withOpacity(0.6),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        /*Positioned(
             top: MediaQuery.of(context).size.height * 0.4 - 50,
             left: MediaQuery.of(context).size.width / 2 - 50,
             child: Container(
@@ -252,8 +331,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Image.asset('assets/icon/iniciar-sesion.png'),
               ),
             ),
-          ),
-        ],
+          ),*/
       ),
     );
   }

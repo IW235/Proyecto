@@ -8,7 +8,7 @@ class SupervisorHomeScreen extends StatelessWidget {
   final String lastName;
   final String area;
 
-  const SupervisorHomeScreen({
+  const SupervisorHomeScreen({super.key, 
     required this.employeeNumber,
     required this.firstName,
     required this.lastName,
